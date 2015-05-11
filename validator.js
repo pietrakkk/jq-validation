@@ -38,18 +38,45 @@
               $(this).removeClass('error');
           }
         }
+
+        if(settings.code){
+          var CODE_PATTERN = /[0-9]{2}-[0-9]{3}$/;
+          var test;
+          var code =  $(this);
+
+          test = CODE_PATTERN.test(code.val());
+
+          if(test){
+            $.ajax({
+            url: "kody.json",
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+              var responseValue = data[code.val()]; 
+
+              if(responseValue){
+                $("#code").append("<span>"+responseValue+"</span>");
+              }           
+            },
+            error: function(response){
+
+            }
+          }); 
+          }
+        }
     });
     return this;
   };
 
-    // $.fn.notNullConstraint = function(){
-    // 	return this.each(function(){
-    // 		$(this).change(function(){
-    // 			if($(this).val() === ''){
-    // 					$(this).addClass('not-null');
-   	//  			}else{
-   	//  				$(this).removeClass('not-null');
-    // 			}
-    // 		});
-    // 	});
+    $.fn.notNullConstraint = function(){
+    	return this.each(function(){
+    		$(this).change(function(){
+    			if($(this).val() === ''){
+    					$(this).addClass('not-null');
+   	 			}else{
+   	 				$(this).removeClass('not-null');
+    			}
+    		});
+    	});
+    }
 }( jQuery ));
