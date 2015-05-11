@@ -1,7 +1,12 @@
 .error{
 	border-color:red;
+	color:red;
 }
 
 .not-null{
 	border-color:red;
+}
+
+.form{
+	display:block;
 }

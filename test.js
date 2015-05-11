@@ -1,4 +1,5 @@
 $(function(){
-	$('#email').validate({email:{}});
-	$('#name').validate({name: {}});
+	$('#email').validateEmail();
+	$('#name').validateText();
+	$('#code').validatePostalCode().notNullConstraint();
 });

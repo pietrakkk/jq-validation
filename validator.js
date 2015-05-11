@@ -1,82 +1,104 @@
-(function ( $ ) {
- 
-    $.fn.validate = function(settings) {
+(function ($) {
 
-        $(this).change(function() {
+    $.fn.validateEmail = function (pattern) {
+        var DEFAULT_EMAIL_PATTERN = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
         var test;
-        
-        if(settings.email){
-            var DEFAULT_EMAIL_PATTERN = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/; 
-      
-            if(settings.email.pattern){
-              test = settings.email.pattern.test($(this).val()); 
-            } else{
-              test =  DEFAULT_EMAIL_PATTERN.test($(this).val());
+
+        $(this).change(function () {
+
+            if (pattern) {
+                test = pattern.test($(this).val());
+            } else {
+                test = DEFAULT_EMAIL_PATTERN.test($(this).val());
             }
-      
- 
-            if(!test){
+
+            if (!test) {
                 $(this).addClass('error');
-            } else{
+            } else {
                 $(this).removeClass('error');
-          }
-        }
+            }
+        });
+        return this;
+    }
 
-      if(settings.name){
-          var test;
-          var DEFAULT_NAME_PATTERN = /^[A-Za-zżźćńółęąśŻŹĆĄŚĘŁÓŃ]+$/; 
-          
-          if(settings.name.pattern){
-              test = settings.name.pattern.test($(this).val()); 
-          } else{
-              test =  DEFAULT_NAME_PATTERN.test($(this).val());
-          }
-      
-          if(!test){
-              $(this).addClass('error');
-          }else{
-              $(this).removeClass('error');
-          }
-        }
+    $.fn.validateText = function (pattern) {
+        var DEFAULT_NAME_PATTERN = /^[A-Za-zżźćńółęąśŻŹĆĄŚĘŁÓŃ]+$/;
+        var test;
 
-        if(settings.code){
-          var CODE_PATTERN = /[0-9]{2}-[0-9]{3}$/;
-          var test;
-          var code =  $(this);
+        $(this).change(function () {
 
-          test = CODE_PATTERN.test(code.val());
+            if (pattern) {
+                test = pattern.test($(this).val());
+            } else {
+                test = DEFAULT_NAME_PATTERN.test($(this).val());
+            }
 
-          if(test){
-            $.ajax({
+            if (!test) {
+                $(this).addClass('error');
+            } else {
+                $(this).removeClass('error');
+            }
+        });
+        return this;
+    };
+
+
+    $.fn.validatePostalCode = function (){
+        var CODE_PATTERN = /[0-9]{2}-[0-9]{3}$/; 
+        var test;
+
+        $(this).change(function () {
+            var postalCode = $(this).val();
+
+            test = CODE_PATTERN.test(postalCode);
+
+            $('#post').remove();
+
+            if (test) {
+                getPostalCode(postalCode);
+            } else {
+                $("#code").after("<span class='error' id='post'>Niepoprawny kod</span>");
+            }
+        });
+        return this;
+    };
+
+
+    function getPostalCode(postalCode) {
+        $.ajax({
             url: "kody.json",
             type: "GET",
             dataType: "json",
             success: function (data) {
-              var responseValue = data[code.val()]; 
+                var responsePostalCode = data[postalCode];
 
-              if(responseValue){
-                $("#code").append("<span>"+responseValue+"</span>");
-              }           
-            },
-            error: function(response){
-
+                if (responsePostalCode) {
+                    $("#code").after("<span id='post'>" + responsePostalCode + "</span>");
+                }
             }
-          }); 
-          }
-        }
-    });
-    return this;
-  };
-
-    $.fn.notNullConstraint = function(){
-    	return this.each(function(){
-    		$(this).change(function(){
-    			if($(this).val() === ''){
-    					$(this).addClass('not-null');
-   	 			}else{
-   	 				$(this).removeClass('not-null');
-    			}
-    		});
-    	});
+        });
     }
-}( jQuery ));
+
+    $.fn.notNullConstraint = function () {
+        return this.each(function () {
+            $(this).change(function () {
+                if ($(this).val() === '') {
+                    $(this).addClass('not-null');
+                } else {
+                    $(this).removeClass('not-null');
+                }
+            });
+        });
+    };
+
+
+    function processSubmit(operation, selector){
+        var submitButton = selector.parent().find('input[type="submit"]');
+        
+        if(operation === 'disable'){
+            submitButton.attr('disabled', 'disabled');
+        } else if(operation === 'enable'){
+            submitButton.removeAttr('disabled');
+        }
+    };
+}(jQuery));
