@@ -1,5 +1,6 @@
 (function ($) {
 
+
     $.fn.validateEmail = function (pattern) {
         var DEFAULT_EMAIL_PATTERN = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
         var test;
@@ -12,32 +13,26 @@
                 test = DEFAULT_EMAIL_PATTERN.test($(this).val());
             }
 
-            if (!test) {
-                $(this).addClass('error');
-            } else {
-                $(this).removeClass('error');
-            }
+           checkErrorStatus(test, $(this));
+
         });
         return this;
-    }
+    };
 
     $.fn.validateText = function (pattern) {
-        var DEFAULT_NAME_PATTERN = /^[A-Za-zżźćńółęąśŻŹĆĄŚĘŁÓŃ]+$/;
+        var DEFAULT_NAME_PATTERN = /^[A-Za-zżźćńółęąśŻŹĆĄŚĘŁÓŃ]*$/;
         var test;
 
-        $(this).change(function () {
 
+        $(this).change(function () {
             if (pattern) {
                 test = pattern.test($(this).val());
             } else {
                 test = DEFAULT_NAME_PATTERN.test($(this).val());
             }
 
-            if (!test) {
-                $(this).addClass('error');
-            } else {
-                $(this).removeClass('error');
-            }
+            checkErrorStatus(test, $(this));
+           
         });
         return this;
     };
@@ -56,8 +51,16 @@
 
             if (test) {
                 getPostalCode(postalCode);
+                $(this).removeAttr('error');
             } else {
+                $(this).attr('error', 'true');
                 $("#code").after("<span class='error' id='post'>Niepoprawny kod</span>");
+            }
+
+             if(submitDisabled($(this))){
+                processSubmit('disable', $(this));
+            }else{
+                processSubmit('enable', $(this));
             }
         });
         return this;
@@ -80,7 +83,13 @@
     }
 
     $.fn.notNullConstraint = function () {
+
+        processSubmit('disable', $(this));
+        
         return this.each(function () {
+            
+            $(this).attr('error', 'true');
+            
             $(this).change(function () {
                 if ($(this).val() === '') {
                     $(this).addClass('not-null');
@@ -101,4 +110,35 @@
             submitButton.removeAttr('disabled');
         }
     };
+
+    function submitDisabled(selector){
+        var inputs = selector.parent().children('input');
+    
+        for(var i = 0 ; i < inputs.length ; i++){
+            if(inputs[i].attributes['error']){
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
+    function checkErrorStatus(test, selector){
+         if (!test) {
+                selector.addClass('error');
+                selector.attr('error', 'true');
+            } else {
+                selector.removeClass('error');
+                selector.removeAttr('error');
+            }
+
+            if(submitDisabled(selector)){
+                processSubmit('disable', selector);
+            }else{
+                processSubmit('enable', selector);
+            }
+    }
+
+
 }(jQuery));

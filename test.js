@@ -1,5 +1,5 @@
 $(function(){
-	$('#email').validateEmail();
-	$('#name').validateText();
-	$('#code').validatePostalCode().notNullConstraint();
+	$('#email').validateEmail().notNullConstraint();
+	$('#name').validateText().notNullConstraint();
+	$('#code').validatePostalCode();
 });
